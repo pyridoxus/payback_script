@@ -15,32 +15,47 @@ if (!$link) {
 }
 else
 { 
-  echo 'Connected successfully<br />'; 
+#  echo 'Connected successfully<br />'; 
   mysql_select_db('payback');
-$sql = "SHOW TABLES FROM payback;";
-$result = mysql_query($sql);
-
-if (!$result) {
-    echo "DB Error, could not list tables\n";
-    echo 'MySQL Error: ' . mysql_error();
-    exit;
-}
-
-while ($row = mysql_fetch_row($result)) {
-    echo "Table: {$row[0]}<br />";
-}
-
-mysql_free_result($result);
   if(!isset($_POST['select']))
   {
     if(isset($_POST['submit']))
     {
+      $sql = "SELECT `running_total` FROM `money` ORDER BY `key` DESC LIMIT 0, 1;";
+#      echo "SQL: $sql<br/>";
+      $result = mysql_query($sql);
+      if (!$result)
+      {
+	echo "DB Error, could not get last row<br />";
+	echo 'MySQL Error: ' . mysql_error();
+	exit;
+      }
+      $row= mysql_fetch_row($result);
+      $total = $row[0];
+#      echo "Total: $total<br />";
+      settype($total, "float");
+      $amount = $_POST['amount'];
+      settype($amount, "float");
+      $total -= $amount;
+      $name = $_POST['name'];
+#      echo "Amount: $amount<br />";
+#      echo "Total: $total<br />";
+      $sql = "INSERT INTO `money` VALUES (NULL, NOW(), '$name', $amount, $total);";
+      $result = mysql_query($sql);
+      if (!$result)
+      {
+	echo "DB Error, could not insert row</br>";
+	echo 'MySQL Error: ' . mysql_error();
+	exit;
+      }
       echo '<h2>Payment Posted</h2>';
       echo '<p><form action="';
       echo htmlentities($_SERVER['PHP_SELF']);
       echo '" method="post">';
       echo '<input type="submit" name="done" value="Continue..." /><br />';
       echo '</form></p>';
+      mysql_free_result($total);
+      mysql_free_result($result);
     }
     else
     {
@@ -70,7 +85,7 @@ mysql_free_result($result);
 	echo 'MySQL Error: ' . mysql_error();
 	exit;
       }
-      echo '<table border=1><tr><td>Date</td><td>Person</td><td>Amount</td><td>Running Total</td></tr>';
+      echo '<p><table border=1><tr><td>Date</td><td>Person</td><td>Amount</td><td>Running Total</td></tr>';
       while ($row = mysql_fetch_row($result))
       {
 	echo "<tr>";
@@ -80,7 +95,7 @@ mysql_free_result($result);
 	}
 	echo "</tr>";
       }
-      echo "</table>";
+      echo "</table></p>";
       mysql_free_result($result);
       echo '<p><form action="';
       echo htmlentities($_SERVER['PHP_SELF']);
@@ -90,7 +105,6 @@ mysql_free_result($result);
     }
     if($_POST["select"] == "payment")
     {
-      echo 'Clicked payment.';
       echo '<p><form action="';
       echo htmlentities($_SERVER['PHP_SELF']);
       echo '" method="post">';
