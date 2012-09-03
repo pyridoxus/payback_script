@@ -15,28 +15,38 @@ if (!$link) {
 }
 else
 { 
-  echo 'Connected successfully'; 
+  echo 'Connected successfully<br />'; 
   mysql_select_db(payback); 
-  if(!$_POST["view"] and !$_POST["payment"])
+  if(!isset($_POST['select']))
   {
-    echo '<form action="payback.php" method="post">';
-    echo '<input type="button" name="view" />View History<br />';
-    echo '<input type="button" name="payment" />Make Payment<br />';
+    echo '<form action="';
+    echo htmlentities($_SERVER['PHP_SELF']);
+    echo '" method="post">';
+    echo '<p><input type="radio" name="select" value="view" /> View History<br />';
+    echo '<input type="radio" name="select" value="payment" /> Make Payment<br /></p>';
+    echo '<input type="submit" name="submit" value="Go!"><br />';
     echo '</form>';
   }
-  if($_POST["view"])
+  else
   {
-    echo 'Clicked view.';
-    echo '<form action="payback.php" method="post">';
-    echo '<input type="button" name="continue" />Continue<br />';
-    echo '</form>';
-  }
-  if($_POST["payment"])
-  {
-    echo 'Clicked payment.';
-    echo '<form action="payback.php" method="post">';
-    echo '<input type="button" name="continue" />Continue<br />';
-    echo '</form>';
+    if($_POST["select"] == "view")
+    {
+      echo 'Clicked view.<br />';
+      echo '<p><form action="';
+      echo htmlentities($_SERVER['PHP_SELF']);
+      echo '" method="post">';
+      echo '<input type="submit" name="done" value="Continue..." /><br />';
+      echo '</form></p>';
+    }
+    if($_POST["select"] == "payment")
+    {
+      echo 'Clicked payment.';
+      echo '<p><form action="';
+      echo htmlentities($_SERVER['PHP_SELF']);
+      echo '" method="post">';
+      echo '<input type="submit" name="done" value="Continue..." /><br />';
+      echo '</form></p>';
+    }
   }
   mysql_close($link);
 }
