@@ -16,7 +16,21 @@ if (!$link) {
 else
 { 
   echo 'Connected successfully<br />'; 
-  mysql_select_db(payback); 
+  mysql_select_db('payback');
+$sql = "SHOW TABLES FROM payback;";
+$result = mysql_query($sql);
+
+if (!$result) {
+    echo "DB Error, could not list tables\n";
+    echo 'MySQL Error: ' . mysql_error();
+    exit;
+}
+
+while ($row = mysql_fetch_row($result)) {
+    echo "Table: {$row[0]}<br />";
+}
+
+mysql_free_result($result);
   if(!isset($_POST['select']))
   {
     echo '<form action="';
